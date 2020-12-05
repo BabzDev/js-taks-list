@@ -11,7 +11,9 @@ loadEventListeners();
 
 function loadEventListeners(){
     form.addEventListener('submit', addTask);
-    taskList.addEventListener('click', removeTask)
+    taskList.addEventListener('click', removeTask);
+    clearBtn.addEventListener('click', clearTasks);
+    filter.addEventListener('keyup', filterTasks);
 }
 
 function fillTasks(){
@@ -61,8 +63,10 @@ function addToLocalStorage(task){
 function removeTask(e){
     const removeTaskParent = e.target.parentElement;
     if(removeTaskParent.classList.contains('delete-item')){
-        taskList.removeChild(removeTaskParent.parentElement);
-        removeFromLocalStorage(removeTaskParent.previousSibling.data)
+        if(confirm('Are you sure?')){
+            taskList.removeChild(removeTaskParent.parentElement);
+            removeFromLocalStorage(removeTaskParent.previousSibling.data);
+        }
     }
     e.preventDefault();
 }
@@ -73,4 +77,28 @@ function removeFromLocalStorage(value) {
         return x != value;
     });
     localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function clearTasks(e){
+    clearLocalStorage();
+    taskList.innerHTML = '';
+
+}
+
+function clearLocalStorage() {
+    localStorage.removeItem('tasks');
+}
+
+function filterTasks(e) {
+    const txt = e.target.value.toString().toLowerCase();
+    document.querySelectorAll('.collection-item').forEach(
+        function(task) {
+            const item = task.firstChild.textContent;
+            if (item.toString().toLowerCase().indexOf(txt) != -1 ){
+                task.style.display = 'block'
+            } else {
+                task.style.display = 'none'
+            }
+        }
+    );
 }
